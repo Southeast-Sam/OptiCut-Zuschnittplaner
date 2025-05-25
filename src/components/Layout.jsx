@@ -3,9 +3,9 @@ import Burgermenu from "./BurgerMenu";
 
 function Layout() {
   return (
-    <div className="w-60 h-40 bg-white overflow-hidden">
+    <div className="w-screen h-screen overflow-hidden">
       <Burgermenu />
-      <main className="">
+      <main className="flex-1 overflow-y-auto p-4">
         <Outlet />
       </main>
     </div>
