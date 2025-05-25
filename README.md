@@ -11,6 +11,10 @@ Der Fokus liegt auf einer übersichtlichen Benutzerführung und einer strukturie
 - Navigation zwischen Zuschnittseite und Verlauf
 - Click-Outside-Logik zum automatischen Schließen des Menüs
 - Animierte Darstellung beim Öffnen der Menü
+- Dynamische Visualisierung der Hauptplatte
+- Maßangaben direkt auf den Plattenkaten (technische Zeichnungslogik)
+- Automatische Skalierung bei großen Maßen
+- Eingabe von mehreren Zuschnitten über ein flexibel Panel
 
 ---
 
@@ -26,4 +30,4 @@ Der Fokus liegt auf einer übersichtlichen Benutzerführung und einer strukturie
 ## 🚧 Projektstatus
 
 - Dieses Projekt befindet sich aktuell in aktiver Entwicklung
-- Weitere Funktionen wie Zuschnittsberechnung, Materialverwaltung und Optimierungslogik sind geplant.
+- Weitere Funktionen wie Zuschnittsberechnung, Materialverwaltung und Optimierungslogik sind geplant
