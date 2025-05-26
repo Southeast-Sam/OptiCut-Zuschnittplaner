@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { FaPlusCircle } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
+import { optimiereZuschnitte } from "../utils/optimizer";
 
 function CuttingPage() {
   const [panelOffen, setPanelOffen] = useState(true); // Steuert, ob das Panel offen ist
   const [maße, setMaße] = useState([]); // Liste der Zuschnitte
   const [platte, setPlatte] = useState({ breite: "", länge: "" }); // Hauptplatte Maße
+  const platzierteBoxen = optimiereZuschnitte(platte, maße); // Optimierte Zuschnitte
   // Initiale Maße der Hauptplatte
   const handleInputChange = (id, feld, wert) => {
     const neueListe = maße.map((eintrag) => {
@@ -123,24 +125,14 @@ function CuttingPage() {
             {/* Hauptplatte anzeigen */}
             <div className="relative">
               <div
-                className="bg-gray-300 border-2 border-black flex items-center justify-center text-gray-100 text-sm relative"
+                className="bg-gray-300 border-2 border-black flex items-center justify-center text-gray-100 text-sm overflow-hidden relative"
                 style={{
                   width: `${breite * scaleFactor}px`,
                   height: `${länge * scaleFactor}px`,
                 }}
               >
                 Hauptplatte
-                {/* Zuschnitte */}
-                {/* Immediately Invoked Function Expression */}
-                {(() => {
-                  let x = 0;
-                  let y = 0;
-                  let reiheHöhe = 0;
-                  const abstand = 0; // Keine Abstande zwischen den Zuschnitten
-                  const boxen = [];
-                  const lücken = [];
-                  const verwendet = new Set();
-
+                {platzierteBoxen.map((box, index) => {
                   const farben = [
                     "bg-blue-300",
                     "bg-green-300",
@@ -152,93 +144,27 @@ function CuttingPage() {
                     "bg-orange-300",
                     "bg-emerald-300",
                   ];
+                  const farbklasse = farben[index % farben.length];
 
-                  const sortierte = [...maße].sort((a, b) => {
-                    const flächeA = Number(a.breite) * Number(a.länge);
-                    const flächeB = Number(b.breite) * Number(b.länge);
-                    return flächeB - flächeA; // Größte Fläche zuerst
-                  });
-
-                  for (let index = 0; index < sortierte.length; index++) {
-                    const zuschnitt = sortierte[index];
-                    const w = Number(zuschnitt.breite);
-                    const h = Number(zuschnitt.länge);
-                    if (!w || !h || isNaN(w) || isNaN(h)) continue; // Ungültige Maße überspringen
-                    if (w > breite || h > länge) continue; // Wenn die Fläche aus der Hauptlatte herausragt
-
-                    if (x + w <= breite) {
-                      // passt in aktuelle Zeile
-                      const farbklasse = farben[index % farben.length];
-                      boxen.push(
-                        <div
-                          key={zuschnitt.id}
-                          className={`absolute ${farbklasse} border border-white text-white text-xs text-[10px] flex items-center justify-center`}
-                          style={{
-                            width: `${w * scaleFactor}px`,
-                            height: `${h * scaleFactor}px`,
-                            left: `${x * scaleFactor}px`,
-                            top: `${y * scaleFactor}px`,
-                          }}
-                        >
-                          {w} x {h}
-                        </div>
-                      );
-
-                      verwendet.add(zuschnitt.id); // Markiere als verwendet
-                      x += w + abstand; // Weiter nach rechts
-                      if (h > reiheHöhe) reiheHöhe = h; // Höchste Box in dieser Reihe merken
-                    } else {
-                      // Passt nicht mehr, Lücke merken
-                      if (x < breite) {
-                        lücken.push({
-                          x,
-                          y,
-                          width: breite - x,
-                          height: reiheHöhe,
-                        });
-                      }
-                      x = 0; // Zurück zur linken Seite
-                      y += reiheHöhe + abstand; // Weiter nach unten
-                      reiheHöhe = 0; // Höhe zurücksetzen für neue Reihe
-                      index--; // Wiederholen in neuer Zeile
-                    }
-                  }
-
-                  // Lücken füllen
-                  for (const lücke of lücken) {
-                    for (const zuschnitt of sortierte) {
-                      if (verwendet.has(zuschnitt.id)) continue; // Überspringe bereits verwendete Zuschnitte
-
-                      const w = Number(zuschnitt.breite);
-                      const h = Number(zuschnitt.länge);
-                      if (!w || !h || isNaN(w) || isNaN(h)) continue;
-                      if (w > breite || h > länge) continue;
-
-                      if (w <= lücke.width && h <= lücke.height) {
-                        const farbklasse = farben[boxen.length % farben.length];
-
-                        boxen.push(
-                          <div
-                            key={zuschnitt.id}
-                            className={`absolute ${farbklasse} border border-white text-white text-xs text-[10px] flex items-center justify-center`}
-                            style={{
-                              width: `${w * scaleFactor}px`,
-                              height: `${h * scaleFactor}px`,
-                              left: `${lücke.x * scaleFactor}px`,
-                              top: `${lücke.y * scaleFactor}px`,
-                            }}
-                          >
-                            {w} x {h}
-                          </div>
-                        );
-
-                        verwendet.add(zuschnitt.id); // Markiere als verwendet
-                        break; // Lücke gefüllt, weiter mit der nächsten
-                      }
-                    }
-                  }
-                  return boxen;
-                })()}
+                  return (
+                    <div
+                      key={box.id}
+                      className={`absolute ${farbklasse} text-white text-xs flex items-center justify-center`}
+                      style={{
+                        width: `${
+                          (box.rotiert ? box.länge : box.breite) * scaleFactor
+                        }px`,
+                        height: `${
+                          (box.rotiert ? box.breite : box.länge) * scaleFactor
+                        }px`,
+                        left: `${box.x * scaleFactor}px`,
+                        top: `${box.y * scaleFactor}px`,
+                      }}
+                    >
+                      {box.breite} x {box.länge}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Beschriftung der Hauptplatte (Länge) */}
