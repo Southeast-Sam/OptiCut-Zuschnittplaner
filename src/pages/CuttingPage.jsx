@@ -136,7 +136,10 @@ function CuttingPage() {
                   let x = 0;
                   let y = 0;
                   let reiheHöhe = 0;
-                  const abstand = 5;
+                  const abstand = 0; // Keine Abstande zwischen den Zuschnitten
+                  const boxen = [];
+                  const lücken = [];
+
                   const farben = [
                     "bg-blue-300",
                     "bg-green-300",
@@ -149,30 +152,22 @@ function CuttingPage() {
                     "bg-emerald-300",
                   ];
 
-                  {
-                    /* Sortiert die Zuschnitte vor der Platzierung */
-                  }
+                  const sortierte = [...maße].sort((a, b) => {
+                    const flächeA = Number(a.breite) * Number(a.länge);
+                    const flächeB = Number(b.breite) * Number(b.länge);
+                    return flächeB - flächeA; // Größte Fläche zuerst
+                  });
 
-                  return [...maße]
+                  for (let index = 0; index < sortierte.length; index++) {
+                    const zuschnitt = sortierte[index];
+                    const w = Number(zuschnitt.breite);
+                    const h = Number(zuschnitt.länge);
+                    if (!w || !h || isNaN(w) || isNaN(h)) continue; // Ungültige Maße überspringen
 
-                    .sort((a, b) => {
-                      const flächeA = Number(a.breite) * Number(a.länge);
-                      const flächeB = Number(b.breite) * Number(b.länge);
-                      return flächeB - flächeA; // Größte Fläche zuerst
-                    })
-                    .map((zuschnitt, index) => {
-                      const w = Number(zuschnitt.breite);
-                      const h = Number(zuschnitt.länge);
-
-                      if (x + w > breite) {
-                        x = 0;
-                        y += reiheHöhe + abstand;
-                        reiheHöhe = 0;
-                      }
-
+                    if (x + w <= breite) {
+                      // passt in aktuelle Zeile
                       const farbklasse = farben[index % farben.length];
-
-                      const box = (
+                      boxen.push(
                         <div
                           key={zuschnitt.id}
                           className={`absolute ${farbklasse} border border-white text-white text-xs text-[10px] flex items-center justify-center`}
@@ -187,10 +182,25 @@ function CuttingPage() {
                         </div>
                       );
 
-                      x += w + abstand;
-                      if (h > reiheHöhe) reiheHöhe = h;
-                      return box;
-                    });
+                      x += w + abstand; // Weiter nach rechts
+                      if (h > reiheHöhe) reiheHöhe = h; // Höchste Box in dieser Reihe merken
+                    } else {
+                      // Passt nicht mehr, Lücke merken
+                      if (x < breite) {
+                        lücken.push({
+                          x,
+                          y,
+                          width: breite - x,
+                          height: reiheHöhe,
+                        });
+                      }
+                      x = 0; // Zurück zur linken Seite
+                      y += reiheHöhe + abstand; // Weiter nach unten
+                      reiheHöhe = 0; // Höhe zurücksetzen für neue Reihe
+                      index--; // Wiederholen in neuer Zeile
+                    }
+                  }
+                  return boxen;
                 })()}
               </div>
 
