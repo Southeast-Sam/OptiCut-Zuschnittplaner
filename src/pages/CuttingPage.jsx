@@ -139,6 +139,7 @@ function CuttingPage() {
                   const abstand = 0; // Keine Abstande zwischen den Zuschnitten
                   const boxen = [];
                   const lücken = [];
+                  const verwendet = new Set();
 
                   const farben = [
                     "bg-blue-300",
@@ -163,6 +164,7 @@ function CuttingPage() {
                     const w = Number(zuschnitt.breite);
                     const h = Number(zuschnitt.länge);
                     if (!w || !h || isNaN(w) || isNaN(h)) continue; // Ungültige Maße überspringen
+                    if (w > breite || h > länge) continue; // Wenn die Fläche aus der Hauptlatte herausragt
 
                     if (x + w <= breite) {
                       // passt in aktuelle Zeile
@@ -182,6 +184,7 @@ function CuttingPage() {
                         </div>
                       );
 
+                      verwendet.add(zuschnitt.id); // Markiere als verwendet
                       x += w + abstand; // Weiter nach rechts
                       if (h > reiheHöhe) reiheHöhe = h; // Höchste Box in dieser Reihe merken
                     } else {
@@ -198,6 +201,40 @@ function CuttingPage() {
                       y += reiheHöhe + abstand; // Weiter nach unten
                       reiheHöhe = 0; // Höhe zurücksetzen für neue Reihe
                       index--; // Wiederholen in neuer Zeile
+                    }
+                  }
+
+                  // Lücken füllen
+                  for (const lücke of lücken) {
+                    for (const zuschnitt of sortierte) {
+                      if (verwendet.has(zuschnitt.id)) continue; // Überspringe bereits verwendete Zuschnitte
+
+                      const w = Number(zuschnitt.breite);
+                      const h = Number(zuschnitt.länge);
+                      if (!w || !h || isNaN(w) || isNaN(h)) continue;
+                      if (w > breite || h > länge) continue;
+
+                      if (w <= lücke.width && h <= lücke.height) {
+                        const farbklasse = farben[boxen.length % farben.length];
+
+                        boxen.push(
+                          <div
+                            key={zuschnitt.id}
+                            className={`absolute ${farbklasse} border border-white text-white text-xs text-[10px] flex items-center justify-center`}
+                            style={{
+                              width: `${w * scaleFactor}px`,
+                              height: `${h * scaleFactor}px`,
+                              left: `${lücke.x * scaleFactor}px`,
+                              top: `${lücke.y * scaleFactor}px`,
+                            }}
+                          >
+                            {w} x {h}
+                          </div>
+                        );
+
+                        verwendet.add(zuschnitt.id); // Markiere als verwendet
+                        break; // Lücke gefüllt, weiter mit der nächsten
+                      }
                     }
                   }
                   return boxen;
