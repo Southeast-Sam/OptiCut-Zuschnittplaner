@@ -15,6 +15,8 @@ Der Fokus liegt auf einer übersichtlichen Benutzerführung und einer strukturie
 - Maßangaben direkt auf den Plattenkaten (technische Zeichnungslogik)
 - Automatische Skalierung bei großen Maßen
 - Eingabe von mehreren Zuschnitten über ein flexibel Panel
+- Optimierungslogik mit Rotation und Lückenfüllung
+- Algorithmus zur bestmöglichen Platzierung bei minimalem Verschnitt
 
 ---
 
@@ -30,4 +32,4 @@ Der Fokus liegt auf einer übersichtlichen Benutzerführung und einer strukturie
 ## 🚧 Projektstatus
 
 - Dieses Projekt befindet sich aktuell in aktiver Entwicklung
-- Weitere Funktionen wie Zuschnittsberechnung, Materialverwaltung und Optimierungslogik sind geplant
+- Weitere Funktionen wie Materialverwaltung, Reststück-Analyse und Exportfunktionen sind geplant.
