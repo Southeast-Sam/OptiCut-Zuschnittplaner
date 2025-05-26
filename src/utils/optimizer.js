@@ -1,102 +1,69 @@
 export function optimiereZuschnitte(platte, zuschnitte) {
-  const platteBreite = Number(platte.breite);
-  const platteLaenge = Number(platte.länge);
+  const breite = Number(platte.breite);
+  const länge = Number(platte.länge);
+  if (!breite || !länge) return [];
+
+  const sortiert = [...zuschnitte]
+    .filter((z) => Number(z.breite) > 0 && Number(z.länge) > 0)
+    .sort((a, b) => b.breite * b.länge - a.breite * a.länge);
+
   const platziert = [];
-  const verwendet = new Set();
+  const luecken = [{ x: 0, y: 0, width: breite, height: länge }];
 
-  // Alle freien Rechtecke (start: gesamte Platte)
-  const freieFlaechen = [
-    {
-      x: 0,
-      y: 0,
-      breite: platteBreite,
-      laenge: platteLaenge,
-    },
-  ];
+  for (const zuschnitt of sortiert) {
+    const b = Number(zuschnitt.breite);
+    const l = Number(zuschnitt.länge);
 
-  // Sortieren nach Fläche (größte zuerst)
-  const sortiert = [...zuschnitte].sort((a, b) => {
-    return b.breite * b.länge - a.breite * a.länge;
-  });
+    let erfolgreich = false;
 
-  for (const teil of sortiert) {
-    const b = Number(teil.breite);
-    const l = Number(teil.länge);
-    if (!b || !l || isNaN(b) || isNaN(l)) continue;
+    // Versuche alle Lücken (sortiert nach y, dann x)
+    luecken.sort((a, b) => a.y - b.y || a.x - b.x);
 
-    let platziertTeil = false;
+    for (let i = 0; i < luecken.length; i++) {
+      const luecke = luecken[i];
 
-    for (let i = 0; i < freieFlaechen.length; i++) {
-      const flaeche = freieFlaechen[i];
+      const passtNormal = b <= luecke.width && l <= luecke.height;
+      const passtRotiert = l <= luecke.width && b <= luecke.height;
 
-      // Versuche ohne Rotation
-      if (b <= flaeche.breite && l <= flaeche.laenge) {
+      const richtung = passtNormal ? "normal" : passtRotiert ? "rotiert" : null;
+
+      if (richtung) {
+        const w = richtung === "normal" ? b : l;
+        const h = richtung === "normal" ? l : b;
+
         platziert.push({
-          id: teil.id,
+          id: zuschnitt.id,
           breite: b,
           länge: l,
-          x: flaeche.x,
-          y: flaeche.y,
-          rotiert: false,
+          x: luecke.x,
+          y: luecke.y,
+          rotiert: richtung === "rotiert",
         });
-        verwendet.add(teil.id);
-        platziertTeil = true;
-        // Restflächen erzeugen
-        freieFlaechen.splice(i, 1);
-        freieFlaechen.push(
+
+        // Neue Lücken generieren
+        const neueLuecken = [
           {
-            // rechts
-            x: flaeche.x + b,
-            y: flaeche.y,
-            breite: flaeche.breite - b,
-            laenge: l,
+            x: luecke.x + w,
+            y: luecke.y,
+            width: luecke.width - w,
+            height: h,
           },
           {
-            // unten
-            x: flaeche.x,
-            y: flaeche.y + l,
-            breite: flaeche.breite,
-            laenge: flaeche.laenge - l,
-          }
-        );
-        break;
-      }
-
-      // Versuche mit Rotation
-      if (l <= flaeche.breite && b <= flaeche.laenge) {
-        platziert.push({
-          id: teil.id,
-          breite: b,
-          länge: l,
-          x: flaeche.x,
-          y: flaeche.y,
-          rotiert: true,
-        });
-        verwendet.add(teil.id);
-        platziertTeil = true;
-        freieFlaechen.splice(i, 1);
-        freieFlaechen.push(
-          {
-            // rechts
-            x: flaeche.x + l,
-            y: flaeche.y,
-            breite: flaeche.breite - l,
-            laenge: b,
+            x: luecke.x,
+            y: luecke.y + h,
+            width: luecke.width,
+            height: luecke.height - h,
           },
-          {
-            // unten
-            x: flaeche.x,
-            y: flaeche.y + b,
-            breite: flaeche.breite,
-            laenge: flaeche.laenge - b,
-          }
-        );
+        ];
+
+        luecken.splice(i, 1); // Alte Lücke entfernen
+        for (const l of neueLuecken) {
+          if (l.width > 0 && l.height > 0) luecken.push(l);
+        }
+
+        erfolgreich = true;
         break;
       }
-    }
-
-    if (!platziertTeil) {
-      // könnte später in weitere Platte verschoben werden
     }
   }
 
