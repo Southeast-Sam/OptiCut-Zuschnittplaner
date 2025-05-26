@@ -3,18 +3,17 @@ import { FaPlusCircle } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
 
 function CuttingPage() {
-  const [panelOffen, setPanelOffen] = useState(true);
-  const [maße, setMaße] = useState([]);
-  const [platte, setPlatte] = useState({ breite: "", länge: "" });
-
+  const [panelOffen, setPanelOffen] = useState(true); // Steuert, ob das Panel offen ist
+  const [maße, setMaße] = useState([]); // Liste der Zuschnitte
+  const [platte, setPlatte] = useState({ breite: "", länge: "" }); // Hauptplatte Maße
+  // Initiale Maße der Hauptplatte
   const handleInputChange = (id, feld, wert) => {
     const neueListe = maße.map((eintrag) => {
       if (eintrag.id === id) {
-        return { ...eintrag, [feld]: wert }; // nur dieses Feld ändern
+        return { ...eintrag, [feld]: wert };
       }
       return eintrag;
     });
-
     setMaße(neueListe);
   };
 
@@ -22,9 +21,8 @@ function CuttingPage() {
     setMaße(maße.filter((eintrag) => eintrag.id !== id));
   };
 
-  const maxPixelBreite = 600;
-  const maxPixelHöhe = 400;
-
+  const maxPixelBreite = window.innerWidth * 0.8;
+  const maxPixelHöhe = window.innerHeight * 0.6;
   const breite = Number(platte.breite);
   const länge = Number(platte.länge);
 
@@ -42,15 +40,12 @@ function CuttingPage() {
         } bg-gray-100 shadow-md flex-shrink-0`}
       >
         <div className="flex justify-between h-10 bg-gray-400 border-b-1 items-center">
-          {/* Auf-/Zuklappen button */}
           <button
             onClick={() => setPanelOffen(!panelOffen)}
             className="p-3 text-md cursor-pointer"
           >
-            {panelOffen ? "▼ einklappen" : "▲ öffnen"}
+            {panelOffen ? "▼ schließen" : "▲ öffnen"}
           </button>
-
-          {/* hinzufügen button */}
           <button
             onClick={() => {
               setMaße([...maße, { id: Date.now(), breite: "", länge: "" }]);
@@ -95,12 +90,12 @@ function CuttingPage() {
         ))}
       </div>
 
-      {/* Hauptbereich oben */}
-      <div className="flex flex-col items-center h-screen overflow-auto gap-4 bg-white overflow-x-scroll overflow-y-scroll">
+      {/* ✅ Hauptbereich (außerhalb vom Panel!) */}
+      <div className="flex flex-col items-center h-screen overflow-auto gap-4 bg-white">
         {/* Hauptplatten-Eingabe */}
         <div className="shadow-lg p-2 w-full max-w-2xl bg-gray-50">
           <h2 className="text-center text-md font-bold mb-2">
-            Hauptplatte festlegen(mm)
+            Hauptplatte festlegen (mm)
           </h2>
           <div className="flex justify-center gap-4">
             <input
@@ -119,23 +114,74 @@ function CuttingPage() {
             />
           </div>
         </div>
+
+        {/* Plattenanzeige */}
         {platte.breite && platte.länge && (
           <div className="flex flex-col items-center mt-2">
-            {/* Oberkante: Breite */}
             <div className="text-sm text-gray-700 mb-1">{breite} mm</div>
 
-            {/* Platte mit Beschriftung auf rechter Kante */}
             <div className="relative">
-              {/* Platte selbst */}
               <div
-                className="bg-gray-300 border-2 border-black"
+                className="bg-gray-300 border-2 border-black flex items-center justify-center text-gray-100 text-sm relative"
                 style={{
                   width: `${breite * scaleFactor}px`,
                   height: `${länge * scaleFactor}px`,
                 }}
-              ></div>
+              >
+                Hauptplatte
+                {/* Zuschnitte */}
+                {/* Immediately Invoked Function Expression */}
+                {(() => {
+                  let x = 0;
+                  let y = 0;
+                  let reiheHöhe = 0;
+                  const abstand = 5;
+                  const farben = [
+                    "bg-blue-300",
+                    "bg-green-300",
+                    "bg-red-300",
+                    "bg-yellow-300",
+                    "bg-purple-300",
+                    "bg-amber-300",
+                    "bg-teal-300",
+                    "bg-orange-300",
+                    "bg-emerald-300",
+                  ];
 
-              {/* Länge direkt auf rechter Kante */}
+                  return maße.map((zuschnitt, index) => {
+                    const w = Number(zuschnitt.breite);
+                    const h = Number(zuschnitt.länge);
+
+                    if (x + w > breite) {
+                      x = 0;
+                      y += reiheHöhe + abstand;
+                      reiheHöhe = 0;
+                    }
+
+                    const farbklasse = farben[index % farben.length];
+
+                    const box = (
+                      <div
+                        key={zuschnitt.id}
+                        className={`absolute ${farbklasse} border border-white text-white text-xs text-[10px] flex items-center justify-center`}
+                        style={{
+                          width: `${w * scaleFactor}px`,
+                          height: `${h * scaleFactor}px`,
+                          left: `${x * scaleFactor}px`,
+                          top: `${y * scaleFactor}px`,
+                        }}
+                      >
+                        {w} x {h}
+                      </div>
+                    );
+
+                    x += w + abstand;
+                    if (h > reiheHöhe) reiheHöhe = h;
+                    return box;
+                  });
+                })()}
+              </div>
+
               <div
                 className="absolute text-sm text-gray-700"
                 style={{

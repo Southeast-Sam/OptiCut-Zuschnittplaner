@@ -41,7 +41,7 @@ function BurgerMenu() {
           {/* Jetzt zeigt der unsichtbare Finger (menuRef) auf die 2 Optionen */}
           <NavLink
             to={"/"}
-            className="absolute translate-x-[20px] translate-y-[70px] w-12 h-12 rounded-full border-black bg-gray-600 text-white flex items-center justify-center p-2 cursor-pointer hover:scale-110 active:scale-100 transition-transform"
+            className="absolute translate-x-[20px] translate-y-[70px] w-12 h-12 rounded-full border-2 border-black bg-gray-600 text-white flex items-center justify-center p-2 cursor-pointer hover:scale-110 active:scale-100 transition-transform"
             style={{
               animation: "pop 0.2s ease-out forwards",
             }}
