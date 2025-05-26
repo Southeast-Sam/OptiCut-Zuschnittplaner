@@ -120,6 +120,7 @@ function CuttingPage() {
           <div className="flex flex-col items-center mt-2">
             <div className="text-sm text-gray-700 mb-1">{breite} mm</div>
 
+            {/* Hauptplatte anzeigen */}
             <div className="relative">
               <div
                 className="bg-gray-300 border-2 border-black flex items-center justify-center text-gray-100 text-sm relative"
@@ -148,40 +149,52 @@ function CuttingPage() {
                     "bg-emerald-300",
                   ];
 
-                  return maße.map((zuschnitt, index) => {
-                    const w = Number(zuschnitt.breite);
-                    const h = Number(zuschnitt.länge);
+                  {
+                    /* Sortiert die Zuschnitte vor der Platzierung */
+                  }
 
-                    if (x + w > breite) {
-                      x = 0;
-                      y += reiheHöhe + abstand;
-                      reiheHöhe = 0;
-                    }
+                  return [...maße]
 
-                    const farbklasse = farben[index % farben.length];
+                    .sort((a, b) => {
+                      const flächeA = Number(a.breite) * Number(a.länge);
+                      const flächeB = Number(b.breite) * Number(b.länge);
+                      return flächeB - flächeA; // Größte Fläche zuerst
+                    })
+                    .map((zuschnitt, index) => {
+                      const w = Number(zuschnitt.breite);
+                      const h = Number(zuschnitt.länge);
 
-                    const box = (
-                      <div
-                        key={zuschnitt.id}
-                        className={`absolute ${farbklasse} border border-white text-white text-xs text-[10px] flex items-center justify-center`}
-                        style={{
-                          width: `${w * scaleFactor}px`,
-                          height: `${h * scaleFactor}px`,
-                          left: `${x * scaleFactor}px`,
-                          top: `${y * scaleFactor}px`,
-                        }}
-                      >
-                        {w} x {h}
-                      </div>
-                    );
+                      if (x + w > breite) {
+                        x = 0;
+                        y += reiheHöhe + abstand;
+                        reiheHöhe = 0;
+                      }
 
-                    x += w + abstand;
-                    if (h > reiheHöhe) reiheHöhe = h;
-                    return box;
-                  });
+                      const farbklasse = farben[index % farben.length];
+
+                      const box = (
+                        <div
+                          key={zuschnitt.id}
+                          className={`absolute ${farbklasse} border border-white text-white text-xs text-[10px] flex items-center justify-center`}
+                          style={{
+                            width: `${w * scaleFactor}px`,
+                            height: `${h * scaleFactor}px`,
+                            left: `${x * scaleFactor}px`,
+                            top: `${y * scaleFactor}px`,
+                          }}
+                        >
+                          {w} x {h}
+                        </div>
+                      );
+
+                      x += w + abstand;
+                      if (h > reiheHöhe) reiheHöhe = h;
+                      return box;
+                    });
                 })()}
               </div>
 
+              {/* Beschriftung der Hauptplatte (Länge) */}
               <div
                 className="absolute text-sm text-gray-700"
                 style={{
