@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPlusCircle } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { optimiereZuschnitte } from "../utils/optimizer";
@@ -7,7 +7,15 @@ function CuttingPage() {
   const [panelOffen, setPanelOffen] = useState(true); // Steuert, ob das Panel offen ist
   const [maße, setMaße] = useState([]); // Liste der Zuschnitte
   const [platte, setPlatte] = useState({ breite: "", länge: "" }); // Hauptplatte Maße
-  const platzierteBoxen = optimiereZuschnitte(platte, maße); // Optimierte Zuschnitte
+  const [platzierteBoxen, setPlatzierteBoxen] = useState([]); // Optimierte Zuschnitte
+
+  useEffect(() => {
+    const ergebnis = optimiereZuschnitte(platte, maße);
+    if (ergebnis) {
+      setPlatzierteBoxen(ergebnis);
+    }
+  }, [platte, maße]);
+
   // Initiale Maße der Hauptplatte
   const handleInputChange = (id, feld, wert) => {
     const neueListe = maße.map((eintrag) => {
@@ -92,7 +100,7 @@ function CuttingPage() {
         ))}
       </div>
 
-      {/* ✅ Hauptbereich (außerhalb vom Panel!) */}
+      {/* Hauptbereich (außerhalb vom Panel!) */}
       <div className="flex flex-col items-center h-screen overflow-auto gap-4 bg-white">
         {/* Hauptplatten-Eingabe */}
         <div className="shadow-lg p-2 w-full max-w-2xl bg-gray-50">
@@ -132,6 +140,7 @@ function CuttingPage() {
                 }}
               >
                 Hauptplatte
+                {/* Zuschnitten anzeigen */}
                 {platzierteBoxen.map((box, index) => {
                   const farben = [
                     "bg-blue-300",
