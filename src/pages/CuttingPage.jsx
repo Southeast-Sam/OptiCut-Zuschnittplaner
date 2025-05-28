@@ -13,6 +13,10 @@ function CuttingPage() {
     const ergebnis = optimiereZuschnitte(platte, maße);
     if (ergebnis) {
       setPlatzierteBoxen(ergebnis);
+
+      // Speichern für PDF-Seite
+      localStorage.setItem("opticut_zuschnitte", JSON.stringify(ergebnis));
+      localStorage.setItem("opticut_platte", JSON.stringify(platte));
     }
   }, [platte, maße]);
 
@@ -133,6 +137,7 @@ function CuttingPage() {
             {/* Hauptplatte anzeigen */}
             <div className="relative">
               <div
+                id="pdf-export-target"
                 className="bg-gray-300 border-2 border-black flex items-center justify-center text-gray-100 text-sm overflow-hidden relative"
                 style={{
                   width: `${breite * scaleFactor}px`,

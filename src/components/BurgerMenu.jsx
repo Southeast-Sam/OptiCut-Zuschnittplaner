@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { FaBars } from "react-icons/fa";
-import { History } from "lucide-react";
+import { GrDocumentPdf } from "react-icons/gr";
 import { GiCircularSawblade } from "react-icons/gi";
 import { NavLink } from "react-router-dom";
 
@@ -49,13 +49,13 @@ function BurgerMenu() {
             <GiCircularSawblade size={22} />
           </NavLink>
           <NavLink
-            to={"history"}
+            to={"pdf"}
             className="absolute translate-x-[75px] translate-y-[10px] w-12 h-12 rounded-full border-2 border-black bg-gray-600 text-white flex items-center justify-center p-2 cursor-pointer hover:scale-110 active:scale-100 transition-transform"
             style={{
               animation: "pop 0.2s ease-out forwards",
             }}
           >
-            <History size={22} />
+            <GrDocumentPdf size={22} />
           </NavLink>
         </div>
       )}
