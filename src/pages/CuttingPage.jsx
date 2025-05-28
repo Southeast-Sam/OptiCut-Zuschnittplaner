@@ -16,7 +16,16 @@ function CuttingPage() {
 
       // Speichern für PDF-Seite
       localStorage.setItem("opticut_zuschnitte", JSON.stringify(ergebnis));
-      localStorage.setItem("opticut_platte", JSON.stringify(platte));
+
+      if (Number(platte.breite) > 0 && Number(platte.länge) > 0) {
+        localStorage.setItem(
+          "opticut_platte",
+          JSON.stringify({
+            breite: Number(platte.breite),
+            länge: Number(platte.länge),
+          })
+        );
+      }
     }
   }, [platte, maße]);
 
