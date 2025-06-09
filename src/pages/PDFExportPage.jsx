@@ -143,7 +143,7 @@ function PDFExportPage() {
       </div>
       <button
         onClick={handlePDFExport}
-        className="mt-6 bg-blue-600 text-white text-lg font-bold px-8 py-2 rounded-3xl hover:bg-blue-700 active:scale-95 flex items-center gap-2"
+        className="mt-6 cursor-pointer bg-blue-600 text-white text-lg font-bold px-8 py-2 rounded-3xl hover:bg-blue-700 active:scale-95 flex items-center gap-2"
       >
         <LuDownload size={20} />
         PDF

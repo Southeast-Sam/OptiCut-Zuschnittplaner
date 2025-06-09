@@ -4,6 +4,12 @@ OptiCut ist ein praktisches React-Projekt zur Visualisierung und Navigation von 
 
 ---
 
+## Live-Demo
+
+👉 [Hier klicken, um die Anwendung zu starten](https://stunning-paletas-4aefea.netlify.app)
+
+---
+
 # Hintergrund
 
 Ich habe mit 14 Jahren als Dachdecker gearbeitet und vor kurzem als Kunststoffschlosser. Dabei habe ich häufig gesehen, dass viele Restschnitte einfach weggeworfen wurden. Genau deshalb entstand die Idee für dieses Projekt: Opticut - eine Webanwendung, die Zuschnitte optimiert, um möglichst wenig Material zu verschwenden. Ich hoffe, dass dieses Tool vor allem für Handwerker eine praktische Unterstützung wird.
